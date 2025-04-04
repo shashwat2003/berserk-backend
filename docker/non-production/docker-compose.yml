@@ -1,0 +1,37 @@
+name: non_prod_berserk_backend
+services:
+  django:
+    build:
+      context: ../..
+      dockerfile: ./docker/non-production/Dockerfile
+      args:
+        - USER=${USER}
+        - WORKDIR=/berserk_backend
+    volumes:
+      - ../..:/berserk_backend
+    ports:
+      - 8000:8000
+    container_name: non_prod_berserk_django
+    # Open and stall the container
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    networks:
+      - db
+
+  celery:
+    build:
+      context: ../..
+      dockerfile: ./docker/non-production/Dockerfile
+      args:
+        - USER=${USER}
+    volumes:
+      - ../..:/berserk_backend
+    container_name: non_prod_berserk_celery
+    # Open and stall the container
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    networks:
+      - db
+
+networks:
+  db:
+    name: non_prod_db_network
+    external: true

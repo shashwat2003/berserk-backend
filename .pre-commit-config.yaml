@@ -1,0 +1,34 @@
+repos:
+    - repo: local
+      hooks:
+          - id: check-commit-message
+            name: Check Commit Message
+            entry: python hooks/check_commit_msg.py
+            language: python
+            stages: [commit-msg]
+            pass_filenames: false
+            always_run: true
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v4.6.0
+      hooks:
+          - id: check-yaml
+            stages: [pre-commit]
+          - id: end-of-file-fixer
+            stages: [pre-commit]
+          - id: trailing-whitespace
+            stages: [pre-commit]
+
+    - repo: https://github.com/psf/black
+      rev: 24.8.0
+      hooks:
+          - id: black
+            args: [--check]
+            stages: [pre-commit]
+
+    - repo: https://github.com/pre-commit/mirrors-mypy
+      rev: v1.11.2
+      hooks:
+          - id: mypy
+            language: system # Use the system environment
+            args: [--config-file=mypy.ini]
+            stages: [pre-commit]

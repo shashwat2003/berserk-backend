@@ -1,0 +1,16 @@
+{
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "always",
+        "source.organizeImports": "always",
+        "source.unusedImports": "always"
+    },
+    "cSpell.words": [
+        "Cascader",
+        "Kolkata",
+        "Kubejen",
+        "OGAPI",
+        "RABBITMQ"
+    ],
+    "python.analysis.typeCheckingMode": "off"
+}

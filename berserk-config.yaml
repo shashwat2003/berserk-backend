@@ -1,0 +1,33 @@
+modules:
+  core:
+    api_versions:
+      - v1
+    settings:
+      standalone: true
+
+  hr:
+    submodules:
+      separation:
+        api_versions:
+          - v1
+    settings:
+      standalone: false
+
+  accounts:
+    submodules:
+      base:
+        api_versions:
+          - v1
+
+settings:
+  is_prod: false
+  key: "^o#1b7q=@1!vaui8uwi(jske-)cb3k#tq9@c+-@-l2=v#2a5r1"
+  db_name: "berserk_db"
+  db_user: "kubejen"
+  db_pass: "postgres@nonprod"
+  db_host: "dev_postgres"
+  db_port: 5432
+  rmq_host: "dev_rabbitmq"
+  rmq_port: 5672
+  rmq_user: "kubejen"
+  rmq_pass: "rabbitmq@nonprod"

@@ -1,0 +1,12 @@
+**/**/__pycache__/
+**/__pycache__/
+**/migrations/*
+!**/migrations/__init__.py
+**/*.pyc
+data
+media
+logs/**
+!logs/.gitkeep
+db_backup
+static
+_routes.py
