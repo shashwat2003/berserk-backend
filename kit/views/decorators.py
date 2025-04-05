@@ -26,12 +26,12 @@ from .types import (
 
 # The only way to achieve type safety + keyword arguments currently is to copy paste all parameters from base to here.
 def extend_schema(
-    type: Any | None = None,
+    _type: Any | None = None,
     *,
     operation_id: Optional[str] = None,
     parameters: Optional[Sequence[Union[OpenApiParameter, _SerializerType]]] = None,
     request: Any = empty,
-    responses: Any = empty,
+    responses: Any = {},
     auth: Optional[Sequence[str]] = None,
     description: Optional[_StrOrPromise] = None,
     summary: Optional[_StrOrPromise] = None,
@@ -60,12 +60,12 @@ def extend_schema(
             default_response_code = STATUS_MAPPING.get(method)
             if default_response_code is None:
                 return f
-
             return og_extend_schema(
                 responses={
                     default_response_code: OpenApiResponse(
-                        type, description="Indicates that operation was successful."
+                        _type, description="Indicates that operation was successful."
                     ),
+                    **responses,
                 },
                 operation_id=operation_id,
                 parameters=parameters,
@@ -170,5 +170,4 @@ def extend_base_schema(cls, handler):
         handler.kwargs = {}
     handler.kwargs["schema"] = ExtendedSchema
 
-    # TODO: auto detect return type from function with default status code mapping
-    return extend_schema(**extend_schema_params)(handler)
+    return og_extend_schema(**extend_schema_params)(handler)

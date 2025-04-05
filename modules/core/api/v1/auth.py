@@ -18,12 +18,13 @@ class UserLoginDetailSerializer(serializers.Serializer):
 class APIView(BaseAPIView):
     authentication = {"post": False}
 
+    @extend_schema(UserLoginDetailSerializer)
     def get(self, request: BaseRequest):
         "Retrieve user details for the logged in user."
-        return UserLoginDetailSerializer(data=request.user)
+        return UserLoginDetailSerializer(request.user)
 
     @extend_schema(
-        str,
+        UserLoginDetailSerializer,
         request={},
         parameters=[
             OpenApiParameter(
@@ -48,7 +49,7 @@ class APIView(BaseAPIView):
         user = AuthService.login(credentials=credentials)
         if user is not None:
             login(request, user)
-            return UserLoginDetailSerializer(data=request.user)
+            return UserLoginDetailSerializer(request.user)
 
         self.fail("Credentials were incorrect!")
 

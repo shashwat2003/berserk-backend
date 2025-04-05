@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 from rest_framework.views import APIView as OGAPIView
 
 from kit.views.permissions import APIAccessPermission, APIAuthenticationPermission
@@ -57,9 +58,11 @@ class BaseAPIView(OGAPIView):
         raise PermissionException(detail=message, code=code)
 
     def finalize_response(self, request: Request, response, *args, **kwargs):
-        if isinstance(response, (list, tuple, dict, str, BaseModel, int)):
+        if isinstance(response, (list, tuple, dict, str, BaseModel, int, Serializer)):
             if isinstance(response, BaseModel):
                 response = response.model_dump()
+            if isinstance(response, Serializer):
+                response = response.data
             default_response_code = (
                 STATUS_MAPPING.get(cast(str, request.method).lower())
                 or status.HTTP_200_OK
