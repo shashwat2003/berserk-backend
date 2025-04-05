@@ -9,4 +9,4 @@ class StatusChoices(models.IntegerChoices):
 
 
 class UserTypeChoices(models.IntegerChoices):
-    EMPLOYEE = 1
+    USER = 1, _("User")

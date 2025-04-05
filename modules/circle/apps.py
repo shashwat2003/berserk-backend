@@ -3,5 +3,5 @@ from django.apps import AppConfig
 
 class BaseConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "modules.hr.base"
-    label = "hr"
+    name = "modules.circle"
+    label = "circle"

@@ -14,8 +14,7 @@ from .types import ModuleConfig, ModuleSettings, SubModuleType, URLSType
 
 DEFAULT_MODULES = ModuleConfig.validate_python(
     {
-        "core": {"api_versions": ["v1"]},
-        "hr": {"submodules": {"base": {"api_versions": ["v1"]}}},
+        "core": {"api_versions": ["v1"], "settings": {"standalone": True}},
     }
 )
 

@@ -20,13 +20,9 @@ class UserManager(BaseManager, OGUserManager):
 
 
 class User(AbstractBaseUser, ModelBase):
-    username = models.CharField(
-        max_length=150,
-        unique=True,
-    )
-    email = models.EmailField(null=True)
+    email = models.EmailField(unique=True)
     type = models.SmallIntegerField(
-        choices=UserTypeChoices, default=UserTypeChoices.EMPLOYEE
+        choices=UserTypeChoices, default=UserTypeChoices.USER
     )
     profile_image = models.ForeignKey(
         UploadFile,
@@ -36,4 +32,4 @@ class User(AbstractBaseUser, ModelBase):
     )
     objects = UserManager()
 
-    USERNAME_FIELD = "username"
+    USERNAME_FIELD = "email"

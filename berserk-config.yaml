@@ -5,19 +5,11 @@ modules:
     settings:
       standalone: true
 
-  hr:
-    submodules:
-      separation:
-        api_versions:
-          - v1
+  circle:
+    api_versions:
+      - v1
     settings:
-      standalone: false
-
-  accounts:
-    submodules:
-      base:
-        api_versions:
-          - v1
+      standalone: true
 
 settings:
   is_prod: false
