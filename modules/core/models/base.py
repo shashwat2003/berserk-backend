@@ -23,14 +23,20 @@ class BaseQuerySet(QuerySet):
         if self._fields is not None:
             raise TypeError("Cannot call delete() after .values() or .values_list()")
 
-        return self.update(status=StatusChoices.UPDATE)
+        return self.update(status=StatusChoices.DELETE)
 
     def dangerous_delete(self):
         """To be used with extremely cation as it deletes data from db."""
         return super().delete()
 
     def update(self, **kwargs):
-        return super().update(**kwargs, updated_at=timezone.now())
+        """Perform soft update for the given query set."""
+        kwargs.setdefault("status", StatusChoices.UPDATE)
+        kwargs.setdefault("updated_at", timezone.now())
+
+        return super().update(
+            **kwargs,
+        )
 
 
 _BaseManager = models.Manager.from_queryset(BaseQuerySet)

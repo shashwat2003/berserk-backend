@@ -42,6 +42,8 @@ class BaseAPIView(OGAPIView):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
+        if cls.__doc__ is None:
+            cls.__doc__ = "No description provided."
         for method in cls.http_method_names:
             handler = getattr(cls, method, None)
             if handler is not None and callable(handler):

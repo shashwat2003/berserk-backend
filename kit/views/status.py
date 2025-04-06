@@ -25,3 +25,4 @@ class StatusCode:
     X_CREATE_SUCCESSFUL = derived_status_code("{0} created successfully!")
     X_UPDATED_SUCCESSFUL = derived_status_code("{0} updated successfully!")
     X_DELETE_SUCCESSFUL = derived_status_code("{0} deleted successfully!")
+    X_SENT_SUCCESSFUL = derived_status_code("{0} sent successfully!")

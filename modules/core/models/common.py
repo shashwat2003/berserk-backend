@@ -22,3 +22,11 @@ class MasterDropdown(DropdownBase):
 
     class Meta(DropdownBase.Meta):
         db_table = "core_dropdown"
+
+
+class UserOTP(ModelBase):
+
+    email = models.EmailField(max_length=255)
+    otp = models.CharField(max_length=6)
+    is_verified = models.BooleanField(default=False)
+    expiry_time = models.DateTimeField()

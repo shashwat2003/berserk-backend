@@ -12,13 +12,14 @@ from drf_spectacular.utils import (
 from drf_spectacular.utils import extend_schema as og_extend_schema
 from drf_spectacular.utils import inline_serializer
 from rest_framework.fields import empty
-from rest_framework.serializers import CharField, Serializer
+from rest_framework.serializers import CharField, Field
 from rest_framework.settings import api_settings
 
 from kit.views.helpers import get_api_from_module_path
 
 from .constants import STATUS_MAPPING
 from .exceptions import CustomError, SerializerError
+from .fields import NullField
 from .permissions import APIAccessPermission, APIAuthenticationPermission
 from .types import (
     CustomErrorResponseType,
@@ -30,7 +31,7 @@ from .types import (
 
 # The only way to achieve type safety + keyword arguments currently is to copy paste all parameters from base to here.
 def extend_schema(
-    _type: Serializer | None = None,
+    _type: Field | None = None,
     *,
     operation_id: Optional[str] = None,
     parameters: Optional[Sequence[Union[OpenApiParameter, _SerializerType]]] = None,
@@ -67,7 +68,10 @@ def extend_schema(
             api_endpoint = get_api_from_module_path(f.__module__)
             response_type = inline_serializer(
                 f"{api_endpoint}{method.capitalize()}",
-                {"data": _type, "message": CharField()},
+                {
+                    "data": _type if _type is not None else NullField(),
+                    "message": CharField(),
+                },
             )
             return og_extend_schema(
                 responses={
