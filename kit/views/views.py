@@ -7,12 +7,11 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView as OGAPIView
 
-from kit.views.permissions import APIAccessPermission, APIAuthenticationPermission
-from kit.views.types import APIAccessMethodType, APIAccessType, AuthenticationMethodType
-
 from .constants import STATUS_MAPPING
 from .decorators import extend_base_schema
 from .exceptions import CustomError, PermissionException
+from .permissions import APIAccessPermission, APIAuthenticationPermission
+from .types import APIAccessMethodType, APIAccessType, AuthenticationMethodType
 
 
 class BaseAPIView(OGAPIView):
@@ -58,16 +57,39 @@ class BaseAPIView(OGAPIView):
         raise PermissionException(detail=message, code=code)
 
     def finalize_response(self, request: Request, response, *args, **kwargs):
-        if isinstance(response, (list, tuple, dict, str, BaseModel, int, Serializer)):
-            if isinstance(response, BaseModel):
-                response = response.model_dump()
-            if isinstance(response, Serializer):
-                response = response.data
+        "Build up the final response based on the items returned from method functions."
+
+        if isinstance(response, (tuple)):
+            match len(response):
+                case 1:
+                    data = response[0]
+                    message = ""
+                    status_code = None
+                case 2:
+                    data, message = response
+                    status_code = None
+                case 3:
+                    data, message, status_code = response
+                case _:
+                    raise ValueError("Invalid response tuple length")
+
+            if isinstance(data, BaseModel):
+                data = data.model_dump()
+            elif isinstance(data, Serializer):
+                data = data.data
+
             default_response_code = (
                 STATUS_MAPPING.get(cast(str, request.method).lower())
                 or status.HTTP_200_OK
             )
-            response = Response(response, status=default_response_code)
+            response = Response(
+                {"data": data, "message": message},
+                status=default_response_code if status_code is None else status_code,
+            )
+        elif not isinstance(response, Response):
+            raise ValueError(
+                "Can only return Response or tuple of (data, message, status_code)!"
+            )
         return super().finalize_response(request, response, *args, **kwargs)
 
     def fail(self, message: str):

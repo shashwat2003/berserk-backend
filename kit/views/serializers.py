@@ -14,10 +14,38 @@ from common.functions import (
 )
 
 from .constants import FIELDS_MAPPING
+from .exceptions import SerializerError
 from .types import CascaderType, DynamicKeysType, PaginationConfigType, RecursiveType
 
 
-class BaseModelListSerializer(serializers.ListSerializer):
+class BaseSerializer(serializers.BaseSerializer):
+    "We override the `is_valid` method to add a custom exception handling."
+
+    def is_valid(self, *, raise_exception: bool = False):
+        assert hasattr(self, "initial_data"), (
+            "Cannot call `.is_valid()` as no `data=` keyword argument was "
+            "passed when instantiating the serializer instance."
+        )
+
+        if not hasattr(self, "_validated_data"):
+            try:
+                self._validated_data = self.run_validation(self.initial_data)
+            except serializers.ValidationError as exc:
+                self._validated_data = {}
+                self._errors = exc.detail
+            except SerializerError as exc:
+                self._validated_data = {}
+                self._errors = exc.detail
+            else:
+                self._errors = {}
+
+        if self._errors and raise_exception:
+            raise SerializerError(self.errors)
+
+        return not bool(self._errors)
+
+
+class BaseModelListSerializer(BaseSerializer, serializers.ListSerializer):
     """A customized `rest_framework.serializers.ListSerializer` with implemented `update` and `get_paginated_response` method.
     - `update`:
         - Call the method defined as `update_list_method` on child serializer.
@@ -121,7 +149,7 @@ class BaseModelListSerializer(serializers.ListSerializer):
         )
 
 
-class BaseModelSerializer(serializers.ModelSerializer):
+class BaseModelSerializer(BaseSerializer, serializers.ModelSerializer):
     """
     A ModelSerializer that takes an additional `fields` argument that
     controls which fields should be displayed.
@@ -210,6 +238,11 @@ class BaseModelSerializer(serializers.ModelSerializer):
         if exclude is not None:
             for field_name in exclude:
                 self.fields.pop(field_name)
+
+    def __init_subclass__(cls):
+        if cls.__doc__ is None:
+            cls.__doc__ = "This is the defined data schema for this operation."
+        return super().__init_subclass__()
 
     def search_field(self, field_name: str, query: str):
         field = self.fields.get(field_name)

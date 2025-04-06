@@ -18,13 +18,13 @@ class UserLoginDetailSerializer(serializers.Serializer):
 class APIView(BaseAPIView):
     authentication = {"post": False}
 
-    @extend_schema(UserLoginDetailSerializer)
+    @extend_schema(UserLoginDetailSerializer())
     def get(self, request: BaseRequest):
         "Retrieve user details for the logged in user."
         return UserLoginDetailSerializer(request.user)
 
     @extend_schema(
-        UserLoginDetailSerializer,
+        UserLoginDetailSerializer(),
         request={},
         parameters=[
             OpenApiParameter(

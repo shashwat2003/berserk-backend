@@ -10,8 +10,12 @@ from drf_spectacular.utils import (
     _StrOrPromise,
 )
 from drf_spectacular.utils import extend_schema as og_extend_schema
+from drf_spectacular.utils import inline_serializer
 from rest_framework.fields import empty
+from rest_framework.serializers import CharField, Serializer
 from rest_framework.settings import api_settings
+
+from kit.views.helpers import get_api_from_module_path
 
 from .constants import STATUS_MAPPING
 from .exceptions import CustomError, SerializerError
@@ -26,7 +30,7 @@ from .types import (
 
 # The only way to achieve type safety + keyword arguments currently is to copy paste all parameters from base to here.
 def extend_schema(
-    _type: Any | None = None,
+    _type: Serializer | None = None,
     *,
     operation_id: Optional[str] = None,
     parameters: Optional[Sequence[Union[OpenApiParameter, _SerializerType]]] = None,
@@ -56,14 +60,20 @@ def extend_schema(
 
     def decorator(f):
         if callable(f):
-            method = getattr(f, "__name__")
+            method: str = getattr(f, "__name__")
             default_response_code = STATUS_MAPPING.get(method)
             if default_response_code is None:
                 return f
+            api_endpoint = get_api_from_module_path(f.__module__)
+            response_type = inline_serializer(
+                f"{api_endpoint}{method.capitalize()}",
+                {"data": _type, "message": CharField()},
+            )
             return og_extend_schema(
                 responses={
                     default_response_code: OpenApiResponse(
-                        _type, description="Indicates that operation was successful."
+                        (response_type),
+                        description="Indicates that operation was successful.",
                     ),
                     **responses,
                 },
@@ -110,7 +120,7 @@ def extend_base_schema(cls, handler):
                 OpenApiExample(
                     "Example 1",
                     description="This is an example custom error, giving a custom error which has to be shown to user.",
-                    value={"msg": "Cannot apply leave within this range!"},
+                    value={"error": "Cannot apply leave within this range!"},
                 ),
             ],
         ),
@@ -121,7 +131,11 @@ def extend_base_schema(cls, handler):
                 OpenApiExample(
                     "Foreign Key doesn't exists",
                     description="This is an example serializer error, when the foreign key doesn't exists.",
-                    value={"author": ['Invalid pk "999" - object does not exist.']},
+                    value={
+                        "error": {
+                            "author": ['Invalid pk "999" - object does not exist.']
+                        }
+                    },
                 ),
             ],
         ),

@@ -42,16 +42,16 @@ class PaginationConfigType(TypedDict):
 
 
 class UnAuthenticatedResponseType(BaseModel):
-    msg: Literal["You are unauthenticated! Please login again!"]
+    error: Literal["You are unauthenticated! Please login again!"]
 
 
 class UnAuthorizedResponseType(BaseModel):
-    msg: Literal["You are not authorized to access this page!"]
+    error: Literal["You are not authorized to access this page!"]
 
 
 class CustomErrorResponseType(BaseModel):
-    msg: str
+    error: str
 
 
 class SerializerErrorResponseType(BaseModel):
-    detail: list[str]
+    error: list[str]

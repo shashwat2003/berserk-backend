@@ -12,5 +12,6 @@
         "OGAPI",
         "RABBITMQ"
     ],
-    "python.analysis.typeCheckingMode": "off"
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.autoImportCompletions": true
 }

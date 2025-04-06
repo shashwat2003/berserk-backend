@@ -21,6 +21,7 @@ class UserManager(BaseManager, OGUserManager):
 
 class User(AbstractBaseUser, ModelBase):
     email = models.EmailField(unique=True)
+    name = models.CharField(max_length=512)
     type = models.SmallIntegerField(
         choices=UserTypeChoices, default=UserTypeChoices.USER
     )

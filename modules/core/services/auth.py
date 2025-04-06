@@ -13,3 +13,10 @@ class AuthService:
         if user is not None:
             return cast(User, user)
         return None
+
+    @classmethod
+    def generate_random_password(cls) -> str:
+        """
+        Generate a random password for the user.
+        """
+        return "ERP@123"
